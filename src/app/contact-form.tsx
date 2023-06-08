@@ -386,7 +386,7 @@ const Form = () => {
           <div className="flex flex-col items-start justify-center space-y-2 w-full">
             <label htmlFor="acceptTerms" className="flex flex-row items-center justify-center">
               <input className="form-checkbox mr-2" name="acceptTerms" type="checkbox" id="acceptTerms" value="yes" onChange={event => setFormData({ ...formData, acceptTerms: event.target.checked ? event.target.value : '' })} required />
-              I agree to the <a href="" className="mx-1 underline">terms &amp; conditions</a> required by this site. <span className="ml-1 text-[red]">*</span>
+              I agree to the <a href="https://solspace.com" className="mx-1 underline">terms &amp; conditions</a> required by this site. <span className="ml-1 text-[red]">*</span>
             </label>
           </div>
         </div>

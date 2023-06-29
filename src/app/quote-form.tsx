@@ -4,6 +4,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { ApolloClient, gql, useMutation, InMemoryCache, ApolloProvider } from '@apollo/client';
 
+type ErrorData = {
+  [key: string]: string;
+};
+
 type FormData = {
   workPhone: string;
   subject: string;
@@ -169,7 +173,11 @@ const Form = () => {
     onError: ({ graphQLErrors }) => {
       showSubmissionError();
 
-      graphQLErrors.forEach(({ message }) => showFieldError(message));
+      graphQLErrors.forEach(({ message }) => {
+        const messages = JSON.parse(message);
+
+        messages.forEach((message: ErrorData) => showFieldError(message));
+      });
 
       stopProcessing();
     },
@@ -209,10 +217,7 @@ const Form = () => {
     }
   };
 
-  const showFieldError = (message: string) => {
-    message = JSON.parse(message);
-    message = message[0];
-
+  const showFieldError = (message: ErrorData) => {
     for (const [key, value] of Object.entries(message)) {
       const element = document.querySelector(`.${key}-field .error-message`);
       if (element) {

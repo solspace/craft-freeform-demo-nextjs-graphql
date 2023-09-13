@@ -34,7 +34,7 @@ type FormProperties = {
     name: string;
     value: string;
   },
-  reCaptcha: {
+  captcha: {
     enabled: boolean;
     handle: string;
     name: string;
@@ -70,7 +70,7 @@ const defaultFormProperties: FormProperties = {
     name: '',
     value: '',
   },
-  reCaptcha: {
+  captcha: {
     enabled: false,
     handle: '',
     name: '',
@@ -97,7 +97,7 @@ const client = new ApolloClient({
 const SAVE_QUOTE_SUBMISSION = gql`
   mutation SaveQuoteSubmission(
     $honeypot: FreeformHoneypotInputType,
-    $reCaptcha: FreeformReCaptchaInputType,
+    $captcha: FreeformCaptchaInputType,
     $csrfToken: FreeformCsrfTokenInputType,
     $workPhone: String,
     $subject: String,
@@ -116,7 +116,7 @@ const SAVE_QUOTE_SUBMISSION = gql`
   ) {
     save_quote_Submission(
       honeypot: $honeypot
-      reCaptcha: $reCaptcha
+      captcha: $captcha
       csrfToken: $csrfToken
       workPhone: $workPhone
       subject: $subject
@@ -140,7 +140,7 @@ const SAVE_QUOTE_SUBMISSION = gql`
 `;
 
 async function getFormProperties(formId: number) {
-  // See https://docs.solspace.com/craft/freeform/v4/developer/graphql/#how-to-render-a-form
+  // See https://docs.solspace.com/craft/freeform/v5/developer/graphql/#how-to-render-a-form
   const response = await fetch(`/freeform/form/properties/${formId}`, { headers: { 'Accept': 'application/json' }});
 
   if (!response.ok) {
@@ -158,7 +158,7 @@ const Form = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [formData, setFormData] = useState(defaultFormData);
-  const [reCaptchaValue, setReCaptchaValue] = useState('');
+  const [captchaValue, setCaptchaValue] = useState('');
   const [formProperties, setFormProperties] = useState(defaultFormProperties);
 
   const [saveQuoteSubmission] = useMutation(SAVE_QUOTE_SUBMISSION, {
@@ -252,13 +252,13 @@ const Form = () => {
     }
 
     const token = await executeRecaptcha();
-    setReCaptchaValue(token);
+    setCaptchaValue(token);
   }, [executeRecaptcha]);
 
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
-    const { csrf, honeypot, reCaptcha } = formProperties;
+    const { csrf, honeypot, captcha } = formProperties;
 
     hideSubmissionError();
     hideSubmissionSuccess();
@@ -274,9 +274,9 @@ const Form = () => {
           name: csrf.name,
           value: csrf.token,
         },
-        reCaptcha: {
-          name: reCaptcha.name,
-          value: reCaptchaValue,
+        captcha: {
+          name: captcha.name,
+          value: captchaValue,
         },
         firstName: formData.firstName,
         lastName: formData.lastName,

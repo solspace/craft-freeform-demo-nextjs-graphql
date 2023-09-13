@@ -105,7 +105,7 @@ const client = new ApolloClient({
 const SAVE_QUOTE_SUBMISSION = gql`
   mutation SaveQuoteSubmission(
     $honeypot: FreeformHoneypotInputType,
-    $captcha: FreeformCaptchaInputType,
+    $captcha: FreeformSubmissionCaptchaInputType,
     $csrfToken: FreeformCsrfTokenInputType,
     $workPhone: String,
     $subject: String,
@@ -159,6 +159,7 @@ async function getFormProperties(formId: number) {
 }
 
 const Form = () => {
+  const spamMessageRef = useRef<HTMLDivElement>(null);
   const errorMessageRef = useRef<HTMLDivElement>(null);
   const successMessageRef = useRef<HTMLDivElement>(null);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
@@ -171,23 +172,29 @@ const Form = () => {
 
   const [saveQuoteSubmission] = useMutation(SAVE_QUOTE_SUBMISSION, {
     onCompleted: (data) => {
+      stopProcessing();
+
       if (data && Object.hasOwn(data, 'save_quote_Submission') && data['save_quote_Submission'] !== null) {
         showSubmissionSuccess();
       } else {
         showSubmissionError();
       }
-      stopProcessing();
     },
     onError: ({ graphQLErrors }) => {
+      stopProcessing();
       showSubmissionError();
 
       graphQLErrors.forEach(({ message }) => {
-        const messages = JSON.parse(message);
+        if (message.includes('Please verify that you are not a robot.')) {
+          showSpamError();
+        } else if (message.includes('Unknown argument')) {
+            console.error(message);
+        } else {
+          const messages = JSON.parse(message);
 
-        messages.forEach((message: ErrorData) => showFieldError(message));
+          messages.forEach((message: ErrorData) => showFieldError(message));
+        }
       });
-
-      stopProcessing();
     },
   });
 
@@ -225,13 +232,22 @@ const Form = () => {
     }
   };
 
+  const showSpamError = () => {
+    if (spamMessageRef.current) {
+      spamMessageRef.current.style.display = 'block';
+      scrollToTop();
+    }
+  };
+
   const showFieldError = (message: ErrorData) => {
     for (const [key, value] of Object.entries(message)) {
-      const element = document.querySelector(`.${key}-field .error-message`);
-      if (element) {
-        element.innerHTML = value[0];
-        element.classList.add('flex');
-        element.classList.remove('hidden');
+      if (!/^-?\d+$/.test(key)) {
+        const element = document.querySelector(`.${key}-field .error-message`);
+        if (element) {
+          element.innerHTML = value[0];
+          element.classList.add('flex');
+          element.classList.remove('hidden');
+        }
       }
     }
   };
@@ -247,6 +263,12 @@ const Form = () => {
         error.classList.remove('flex');
         error.classList.add('hidden');
       });
+    }
+  };
+
+  const hideSpamError = () => {
+    if (spamMessageRef.current) {
+      spamMessageRef.current.style.display = 'none';
     }
   };
 
@@ -268,6 +290,7 @@ const Form = () => {
 
     const { csrf, honeypot, captcha } = formProperties;
 
+    hideSpamError();
     hideSubmissionError();
     hideSubmissionSuccess();
     startProcessing();
@@ -352,6 +375,9 @@ const Form = () => {
       </div>
       <div ref={errorMessageRef} className="w-full bg-red-100 border border-red-400 text-sm text-left text-red-700 px-4 py-2 rounded-md mb-8" style={{ display: 'none' }}>
         <p>{formProperties.settings.behavior.errorMessage}</p>
+      </div>
+      <div ref={spamMessageRef} className="w-full bg-red-100 border border-red-400 text-sm text-left text-red-700 px-4 py-2 rounded-md mb-8" style={{ display: 'none' }}>
+        <p>Please verify that you are not a robot.</p>
       </div>
       <div className="flex flex-col w-full space-y-3">
         <div className="form-row">

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_USE_SYSTEM_CA=1 NODE_EXTRA_CA_CERTS=$(mkcert -CAROOT)/rootCA.pem next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,16 +16,16 @@
     "@types/react-dom": "18.2.4",
     "@types/react-google-recaptcha": "^2.1.5",
     "autoprefixer": "10.4.14",
-    "eslint": "8.41.0",
-    "eslint-config-next": "13.4.4",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^13.5.11",
     "graphql": "^16.6.0",
-    "next": "13.4.4",
-    "postcss": "8.4.24",
+    "next": "^16.2.4",
+    "postcss": "^8.5.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-google-recaptcha": "^2.1.0",
     "react-google-recaptcha-v3": "^1.10.1",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "^5.1.0"
   }
 }

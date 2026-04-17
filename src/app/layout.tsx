@@ -1,22 +1,23 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import React from 'react';
+import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'Next.js + GraphQL demo for Freeform 5 for Craft 4',
-  description: 'Next.js + GraphQL demo for Freeform 5 for Craft 4',
+export const metadata: Metadata = {
+    title: 'Next.js + GraphQL demo for Freeform 5 for Craft 5',
+    description: 'Next.js + GraphQL demo for Freeform 5 for Craft 5',
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode,
+    children: React.ReactNode,
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body className={inter.className}>{children}</body>
+        </html>
+    );
 };

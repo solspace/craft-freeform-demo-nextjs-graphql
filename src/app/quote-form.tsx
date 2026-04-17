@@ -184,6 +184,7 @@ const Form = () => {
         },
         onError: ({ graphQLErrors }) => {
             stopProcessing();
+            showSubmissionError();
 
             let hasFieldErrors = false;
             let hasSpamError = false;

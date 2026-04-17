@@ -4,6 +4,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { ApolloClient, gql, useMutation, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 
+// ENTER YOUR FORM ID HERE
+const FORM_ID = undefined;
+
+// ENTER YOUR RECAPTCHA KEY HERE
+const RECAPTCHA_SITE_KEY = undefined;
+
 type ErrorData = {
     [key: string]: string[];
 };
@@ -80,9 +86,6 @@ const defaultFormProperties: FormProperties = {
     errorMessage: '',
 };
 
-// ENTER YOUR RECAPTCHA KEY HERE
-const RECAPTCHA_SITE_KEY = '';
-
 const client = new ApolloClient({
   link: new HttpLink({
       uri: '/craft/graphql/api',
@@ -142,8 +145,8 @@ const SAVE_QUOTE_SUBMISSION = gql`
     }
 `;
 
-async function getFormProperties(formId: number): Promise<FormProperties> {
-    const response = await fetch(`/craft/freeform/form/properties/${formId}`, {
+async function getFormProperties(): Promise<FormProperties> {
+    const response = await fetch(`/craft/freeform/form/properties/${FORM_ID}`, {
         headers: {
             Accept: 'application/json',
         },
@@ -378,10 +381,7 @@ const Form = () => {
     useEffect(() => {
         let ignore = false;
 
-        // ENTER YOUR FORM ID HERE
-        const formId = undefined;
-
-        getFormProperties(formId)
+        getFormProperties()
             .then((formProperties) => {
                 if (!ignore) {
                     setFormProperties(formProperties);

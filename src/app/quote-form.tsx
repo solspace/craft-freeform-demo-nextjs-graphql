@@ -187,26 +187,18 @@ const Form = () => {
             stopProcessing();
             showSubmissionError();
 
-            let hasFieldErrors = false;
             let hasSpamError = false;
-            let hasGeneralError = false;
 
             graphQLErrors.forEach(({ message }) => {
                 if (message.includes('Please verify that you are not a robot.')) {
                     hasSpamError = true;
                 } else if (message.includes('Unknown argument')) {
-                    hasGeneralError = true;
-
                     console.error(message);
                 } else {
                     try {
                       const messages = JSON.parse(message) as ErrorData[];
                       messages.forEach((message) => showFieldError(message));
-
-                      hasFieldErrors = true;
                     } catch {
-                      hasGeneralError = true;
-
                       console.error(message);
                     }
                 }
@@ -214,10 +206,6 @@ const Form = () => {
 
             if (hasSpamError) {
                 showSpamError();
-            }
-
-            if (hasGeneralError || (!hasFieldErrors && !hasSpamError)) {
-                showSubmissionError();
             }
         },
     });

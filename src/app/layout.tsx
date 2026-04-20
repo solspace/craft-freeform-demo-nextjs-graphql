@@ -6,8 +6,8 @@ import { Metadata } from 'next';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'Next.js + GraphQL demo for Freeform 5 for Craft 5',
-    description: 'Next.js + GraphQL demo for Freeform 5 for Craft 5',
+    title: 'Next.js + GraphQL demo for Freeform 5 for Craft 4',
+    description: 'Next.js + GraphQL demo for Freeform 5 for Craft 4',
 };
 
 export default function RootLayout({

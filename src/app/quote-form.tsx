@@ -5,10 +5,10 @@ import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recapt
 import { ApolloClient, gql, useMutation, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 
 // ENTER YOUR FORM ID HERE
-const FORM_ID = 21;
+const FORM_ID = undefined;
 
 // ENTER YOUR RECAPTCHA KEY HERE
-const RECAPTCHA_SITE_KEY = '6LeApZMrAAAAAFL3uAaRsuJH5RsNkn7gyZJsDaFy';
+const RECAPTCHA_SITE_KEY = undefined;
 
 type ErrorData = {
     [key: string]: string[];

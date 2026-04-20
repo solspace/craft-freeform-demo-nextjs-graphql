@@ -45,9 +45,13 @@ type FormProperties = {
         handle: string;
         name: string;
     }];
-    loadingText: string;
-    successMessage: string;
-    errorMessage: string;
+    settings: {
+        behavior: {
+            processingText: string,
+            successMessage: string,
+            errorMessage: string,
+        },
+    },
 };
 
 const defaultFormData: FormData = {
@@ -81,9 +85,13 @@ const defaultFormProperties: FormProperties = {
         handle: '',
         name: '',
     }],
-    loadingText: '',
-    successMessage: '',
-    errorMessage: '',
+    settings: {
+        behavior: {
+            processingText: '',
+            successMessage: '',
+            errorMessage: '',
+        },
+    },
 };
 
 const client = new ApolloClient({
@@ -103,7 +111,7 @@ const client = new ApolloClient({
 const SAVE_QUOTE_SUBMISSION = gql`
     mutation SaveQuoteSubmission(
         $honeypot: FreeformHoneypotInputType,
-        $reCaptcha: FreeformCaptchaInputType,
+        $captcha: FreeformCaptchaInputType,
         $csrfToken: FreeformCsrfTokenInputType,
         $workPhone: String,
         $subject: String,
@@ -122,7 +130,7 @@ const SAVE_QUOTE_SUBMISSION = gql`
     ) {
         save_quote_Submission(
             honeypot: $honeypot
-            reCaptcha: $reCaptcha
+            captcha: $captcha
             csrfToken: $csrfToken
             workPhone: $workPhone
             subject: $subject
@@ -292,7 +300,8 @@ const Form = () => {
             return;
         }
 
-        const { csrf, honeypot, reCaptcha } = formProperties;
+        const { csrf, honeypot, captchas } = formProperties;
+        const captcha = captchas?.[0];
 
         hideSpamError();
         hideSubmissionError();
@@ -300,9 +309,9 @@ const Form = () => {
         startProcessing();
 
         try {
-            let reCaptchaInput: { name: string; value: string } | undefined;
+            let captchaInput: { name: string; value: string } | undefined;
 
-            if (reCaptcha?.enabled) {
+            if (captcha?.enabled) {
                 const token = await handleReCaptchaVerify();
 
                 if (!token) {
@@ -312,8 +321,8 @@ const Form = () => {
                     return;
                 }
 
-                reCaptchaInput = {
-                    name: reCaptcha.name,
+                captchaInput = {
+                    name: captcha.name,
                     value: token,
                 };
             }
@@ -328,7 +337,7 @@ const Form = () => {
                         name: csrf.name,
                         value: csrf.token,
                     },
-                    reCaptcha: reCaptchaInput,
+                    captcha: captchaInput,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
                     companyName: formData.companyName,
@@ -395,12 +404,12 @@ const Form = () => {
             <h3 className="mb-4 text-xl font-normal text-left">Quote Form</h3>
             {showSuccess && (
                 <div className="w-full bg-green-100 border border-green-400 text-sm text-left text-green-700 px-4 py-2 rounded-md mb-8">
-                    <p>{formProperties.successMessage}</p>
+                    <p>{formProperties.settings.behavior.successMessage}</p>
                 </div>
             )}
             {showError && (
                 <div className="w-full bg-red-100 border border-red-400 text-sm text-left text-red-700 px-4 py-2 rounded-md mb-8">
-                    <p>{formProperties.errorMessage || 'There was a problem submitting the form.'}</p>
+                    <p>{formProperties.settings.behavior.errorMessage || 'There was a problem submitting the form.'}</p>
                 </div>
             )}
             {showSpam && (
@@ -539,7 +548,7 @@ const Form = () => {
                 </div>
                 <div className="form-row">
                     <div className="flex flex-row items-left justify-left space-y-2 w-full">
-                        <button className="btn-primary" type="submit" disabled={isProcessing || !isFormReady} style={{ cursor: isProcessing || !isFormReady ? 'not-allowed' : 'pointer' }}>{isProcessing ? formProperties.loadingText || 'Submitting...' : !isFormReady ? 'Loading...' : 'Submit'}</button>
+                        <button className="btn-primary" type="submit" disabled={isProcessing || !isFormReady} style={{ cursor: isProcessing || !isFormReady ? 'not-allowed' : 'pointer' }}>{isProcessing ? formProperties.settings.behavior.processingText || 'Submitting...' : !isFormReady ? 'Loading...' : 'Submit'}</button>
                     </div>
                 </div>
             </div>
